@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+<title>Star Drifter — アーケードシューティング</title>
+<style>
+  :root {
+    --bg: #060912;
+    --accent: #6ea8ff;
+    --text: #e8edff;
+    --muted: #8c9ac0;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: radial-gradient(900px 600px at 50% -10%, #131d36 0%, var(--bg) 60%);
+    color: var(--text);
+    font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", "Noto Sans JP", sans-serif;
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    height: 100vh;
+  }
+  #wrap { position: relative; }
+  canvas {
+    display: block;
+    background: #060912;
+    border: 1px solid rgba(120,150,220,0.25);
+    border-radius: 14px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.55);
+    touch-action: none;
+  }
+  .hud {
+    position: absolute; top: 14px; left: 16px; right: 16px;
+    display: flex; justify-content: space-between;
+    font-weight: 650; font-size: 15px; letter-spacing: 0.3px;
+    pointer-events: none; text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+  }
+  .hud .muted { color: var(--muted); font-weight: 500; }
+  .overlay {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; gap: 14px;
+    background: rgba(6,9,18,0.72);
+    backdrop-filter: blur(6px);
+    border-radius: 14px;
+  }
+  .overlay.hidden { display: none; }
+  .overlay h1 { margin: 0; font-size: 34px; letter-spacing: 1px; }
+  .overlay h2 { margin: 0; font-size: 26px; color: var(--accent); }
+  .overlay p { margin: 0; color: var(--muted); max-width: 320px; font-size: 13.5px; }
+  .overlay .big { font-size: 18px; color: var(--text); }
+  button {
+    margin-top: 6px;
+    background: linear-gradient(180deg, #6ea8ff, #4d7ee0);
+    color: #06122c; border: none;
+    padding: 12px 30px; border-radius: 999px;
+    font-size: 16px; font-weight: 700; cursor: pointer;
+    box-shadow: 0 8px 24px rgba(78,126,224,0.45);
+    transition: transform 0.06s;
+  }
+  button:active { transform: translateY(2px); }
+  .keys { color: var(--muted); font-size: 12.5px; }
+  .keys kbd {
+    background: rgba(120,150,220,0.18);
+    border: 1px solid rgba(120,150,220,0.3);
+    border-radius: 6px; padding: 1px 7px; font-size: 12px;
+    color: var(--text);
+  }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <canvas id="game" width="480" height="640"></canvas>
+  <div class="hud">
+    <div>SCORE <span id="score">0</span></div>
+    <div class="muted">BEST <span id="best">0</span></div>
+    <div>♥ <span id="lives">3</span></div>
+  </div>
+
+  <div class="overlay" id="overlay">
+    <h1>STAR DRIFTER</h1>
+    <p>降ってくる隕石を撃ち落とし、ぶつからずに生き残れ。長く戦うほどスピードが上がる。</p>
+    <div class="keys">
+      移動 <kbd>←</kbd><kbd>→</kbd> または <kbd>A</kbd><kbd>D</kbd> / マウス・タッチ &nbsp;·&nbsp; 弾は自動発射
+    </div>
+    <button id="startBtn">スタート</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  const canvas = document.getElementById("game");
+  const ctx = canvas.getContext("2d");
+  const W = canvas.width, H = canvas.height;
+
+  const scoreEl = document.getElementById("score");
+  const bestEl = document.getElementById("best");
+  const livesEl = document.getElementById("lives");
+  const overlay = document.getElementById("overlay");
+  const startBtn = document.getElementById("startBtn");
+
+  let best = +(localStorage.getItem("starDrifterBest") || 0);
+  bestEl.textContent = best;
+
+  const STATE = { MENU: 0, PLAY: 1, OVER: 2 };
+  let state = STATE.MENU;
+
+  const ship = { x: W / 2, y: H - 60, w: 30, h: 30, speed: 6, cooldown: 0 };
+  let bullets, rocks, particles, stars;
+  let score, lives, tick, spawnTimer, difficulty;
+  const keys = {};
+  let pointerX = null;
+
+  function reset() {
+    bullets = [];
+    rocks = [];
+    particles = [];
+    stars = [];
+    for (let i = 0; i < 70; i++) {
+      stars.push({ x: Math.random() * W, y: Math.random() * H, z: Math.random() * 0.8 + 0.2 });
+    }
+    score = 0; lives = 3; tick = 0; spawnTimer = 0; difficulty = 1;
+    ship.x = W / 2; ship.cooldown = 0;
+    pointerX = null;
+    updateHud();
+  }
+
+  function updateHud() {
+    scoreEl.textContent = score;
+    livesEl.textContent = lives;
+  }
+
+  function start() {
+    reset();
+    state = STATE.PLAY;
+    overlay.classList.add("hidden");
+  }
+
+  function gameOver() {
+    state = STATE.OVER;
+    if (score > best) {
+      best = score;
+      localStorage.setItem("starDrifterBest", best);
+      bestEl.textContent = best;
+    }
+    overlay.innerHTML =
+      '<h1>GAME OVER</h1>' +
+      '<h2>SCORE ' + score + '</h2>' +
+      '<p class="big">ベスト ' + best + '</p>' +
+      '<button id="startBtn">もう一度</button>';
+    overlay.classList.remove("hidden");
+    document.getElementById("startBtn").addEventListener("click", start);
+  }
+
+  function spawnRock() {
+    const r = Math.random() * 16 + 14;
+    rocks.push({
+      x: Math.random() * (W - 2 * r) + r,
+      y: -r,
+      r: r,
+      vx: (Math.random() - 0.5) * 1.5,
+      vy: (Math.random() * 0.8 + 0.8) * difficulty,
+      hp: Math.ceil(r / 12),
+      spin: (Math.random() - 0.5) * 0.06,
+      a: Math.random() * Math.PI,
+    });
+  }
+
+  function burst(x, y, color, n) {
+    for (let i = 0; i < n; i++) {
+      const ang = Math.random() * Math.PI * 2;
+      const sp = Math.random() * 3 + 1;
+      particles.push({
+        x, y,
+        vx: Math.cos(ang) * sp,
+        vy: Math.sin(ang) * sp,
+        life: 1, color,
+      });
+    }
+  }
+
+  function update() {
+    tick++;
+    difficulty = 1 + tick / 2600;
+
+    // ship movement
+    let dir = 0;
+    if (keys.ArrowLeft || keys.a || keys.A) dir -= 1;
+    if (keys.ArrowRight || keys.d || keys.D) dir += 1;
+    if (pointerX !== null) {
+      const dx = pointerX - ship.x;
+      if (Math.abs(dx) > 2) ship.x += Math.max(-ship.speed, Math.min(ship.speed, dx * 0.3));
+    } else {
+      ship.x += dir * ship.speed;
+    }
+    ship.x = Math.max(ship.w / 2, Math.min(W - ship.w / 2, ship.x));
+
+    // shooting
+    ship.cooldown--;
+    if (ship.cooldown <= 0) {
+      bullets.push({ x: ship.x, y: ship.y - 18, vy: -9 });
+      ship.cooldown = 11;
+    }
+
+    // bullets
+    for (let i = bullets.length - 1; i >= 0; i--) {
+      const b = bullets[i];
+      b.y += b.vy;
+      if (b.y < -10) bullets.splice(i, 1);
+    }
+
+    // spawn
+    spawnTimer--;
+    if (spawnTimer <= 0) {
+      spawnRock();
+      spawnTimer = Math.max(18, 55 - tick / 60);
+    }
+
+    // rocks
+    for (let i = rocks.length - 1; i >= 0; i--) {
+      const rk = rocks[i];
+      rk.x += rk.vx; rk.y += rk.vy; rk.a += rk.spin;
+      if (rk.x < rk.r || rk.x > W - rk.r) rk.vx *= -1;
+
+      // bullet hits
+      for (let j = bullets.length - 1; j >= 0; j--) {
+        const b = bullets[j];
+        const dx = b.x - rk.x, dy = b.y - rk.y;
+        if (dx * dx + dy * dy < rk.r * rk.r) {
+          bullets.splice(j, 1);
+          rk.hp--;
+          burst(b.x, b.y, "180,210,255", 4);
+          if (rk.hp <= 0) {
+            score += Math.round(rk.r);
+            burst(rk.x, rk.y, "255,180,120", 16);
+            rocks.splice(i, 1);
+            updateHud();
+          }
+          break;
+        }
+      }
+      if (!rocks[i]) continue;
+
+      // ship collision
+      const dx = rk.x - ship.x, dy = rk.y - ship.y;
+      if (dx * dx + dy * dy < (rk.r + 12) * (rk.r + 12)) {
+        rocks.splice(i, 1);
+        burst(ship.x, ship.y, "255,90,90", 24);
+        lives--; updateHud();
+        if (lives <= 0) { gameOver(); return; }
+        continue;
+      }
+      if (rk.y > H + rk.r) rocks.splice(i, 1);
+    }
+
+    // particles
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.x += p.vx; p.y += p.vy; p.vy += 0.04; p.life -= 0.03;
+      if (p.life <= 0) particles.splice(i, 1);
+    }
+
+    // stars scroll
+    for (const s of stars) {
+      s.y += s.z * 1.2 * difficulty;
+      if (s.y > H) { s.y = 0; s.x = Math.random() * W; }
+    }
+
+    // passive score
+    if (tick % 6 === 0) { score++; updateHud(); }
+  }
+
+  function drawShip() {
+    ctx.save();
+    ctx.translate(ship.x, ship.y);
+    ctx.fillStyle = "#6ea8ff";
+    ctx.beginPath();
+    ctx.moveTo(0, -16);
+    ctx.lineTo(13, 14);
+    ctx.lineTo(0, 7);
+    ctx.lineTo(-13, 14);
+    ctx.closePath();
+    ctx.fill();
+    // thruster flame
+    ctx.fillStyle = "rgba(255," + (140 + Math.random() * 80 | 0) + ",80,0.9)";
+    ctx.beginPath();
+    ctx.moveTo(-5, 10); ctx.lineTo(0, 18 + Math.random() * 8); ctx.lineTo(5, 10);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawRock(rk) {
+    ctx.save();
+    ctx.translate(rk.x, rk.y);
+    ctx.rotate(rk.a);
+    ctx.fillStyle = "#8a93ad";
+    ctx.strokeStyle = "#c2c9dd";
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    const sides = 7;
+    for (let k = 0; k <= sides; k++) {
+      const ang = (k / sides) * Math.PI * 2;
+      const rad = rk.r * (0.78 + ((k * 13) % 5) / 18);
+      const px = Math.cos(ang) * rad, py = Math.sin(ang) * rad;
+      k === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    }
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function render() {
+    ctx.clearRect(0, 0, W, H);
+
+    // stars
+    for (const s of stars) {
+      ctx.fillStyle = "rgba(200,215,255," + s.z + ")";
+      ctx.fillRect(s.x, s.y, s.z * 2, s.z * 2);
+    }
+
+    if (state !== STATE.PLAY && state !== STATE.OVER) return;
+
+    // bullets
+    ctx.fillStyle = "#bfe0ff";
+    for (const b of bullets) ctx.fillRect(b.x - 1.5, b.y - 8, 3, 12);
+
+    for (const rk of rocks) drawRock(rk);
+
+    // particles
+    for (const p of particles) {
+      ctx.fillStyle = "rgba(" + p.color + "," + p.life + ")";
+      ctx.fillRect(p.x - 1.5, p.y - 1.5, 3, 3);
+    }
+
+    if (state === STATE.PLAY) drawShip();
+  }
+
+  function loop() {
+    if (state === STATE.PLAY) update();
+    render();
+    requestAnimationFrame(loop);
+  }
+
+  // input
+  window.addEventListener("keydown", e => {
+    keys[e.key] = true;
+    if (["ArrowLeft", "ArrowRight", " "].includes(e.key)) e.preventDefault();
+    if (e.key !== "Tab") pointerX = null;
+  });
+  window.addEventListener("keyup", e => { keys[e.key] = false; });
+
+  function pointerMove(clientX) {
+    const rect = canvas.getBoundingClientRect();
+    pointerX = (clientX - rect.left) * (W / rect.width);
+  }
+  canvas.addEventListener("mousemove", e => { if (state === STATE.PLAY) pointerMove(e.clientX); });
+  canvas.addEventListener("touchstart", e => { e.preventDefault(); if (state === STATE.PLAY) pointerMove(e.touches[0].clientX); }, { passive: false });
+  canvas.addEventListener("touchmove", e => { e.preventDefault(); if (state === STATE.PLAY) pointerMove(e.touches[0].clientX); }, { passive: false });
+
+  startBtn.addEventListener("click", start);
+
+  reset();
+  loop();
+})();
+</script>
+</body>
+</html>
