@@ -7,11 +7,12 @@ name: note-auto
 
 on:
   schedule:
-    - cron: "0 0 * * 1"   # 毎週月曜 09:00 JST（UTC 00:00）
+    - cron: "0 22 * * *"   # 毎朝 07:00 JST（UTC 22:00）に実行
   workflow_dispatch:       # 手動実行も可能
 
 permissions:
   contents: write          # 生成した記事をリポジトリに保存（コミット）するため
+  issues: write            # 記事完成のお知らせ（Issue）を作るため
 
 jobs:
   generate:
@@ -33,6 +34,7 @@ jobs:
           python -m note_auto run --config note_config.toml --count 1 --verbose
 
       - name: Save articles into the repo (so you can read them on the website)
+        id: save
         run: |
           mkdir -p articles
           cp drafts/*.md articles/ 2>/dev/null || true
@@ -42,7 +44,19 @@ jobs:
             git add articles
             git commit -m "Add generated note article(s)"
             git push
+            echo "created=true" >> "$GITHUB_OUTPUT"
+            echo "file=$(ls -t articles/*.md | head -1)" >> "$GITHUB_OUTPUT"
           fi
+
+      - name: Notify that today's article is ready (お知らせを作る)
+        if: steps.save.outputs.created == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          file='${{ steps.save.outputs.file }}'
+          name=$(basename "$file" .md)
+          body=$(printf '🎉 今日の note 記事ができました！\n\n下のリンクをタップすると読めます👇\n\nhttps://github.com/%s/blob/main/%s\n\nコピーして note に貼ってください。' "${{ github.repository }}" "$file")
+          gh issue create --title "☕ 今日のnote記事ができました: $name" --body "$body"
 
       - name: Upload drafts (backup)
         uses: actions/upload-artifact@v4
