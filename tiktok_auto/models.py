@@ -62,3 +62,53 @@ class VideoScript:
     @staticmethod
     def default_stem(hook: str) -> str:
         return f"{_dt.date.today().isoformat()}-{slugify(hook)}"
+
+
+@dataclass
+class Character:
+    """会話に登場するキャラ（材料など）。"""
+
+    name: str        # 例: バターさん
+    emoji: str = ""  # 例: 🧈
+
+
+@dataclass
+class DialogueTurn:
+    """会話の1ターン。"""
+
+    speaker: int     # characters のインデックス（0 or 1）
+    line: str        # セリフ
+
+
+@dataclass
+class DialogueScript:
+    """会話形式ショート動画の台本（材料キャラの掛け合い）。"""
+
+    title: str
+    characters: List[Character]
+    turns: List[DialogueTurn]
+    caption: str = ""
+    hashtags: List[str] = field(default_factory=list)
+
+    def caption_text(self) -> str:
+        tags = " ".join(f"#{t}" for t in self.hashtags)
+        return f"{self.caption}\n\n{tags}".strip() + "\n"
+
+    def to_dict(self) -> dict:
+        return {
+            "title": self.title,
+            "characters": [asdict(c) for c in self.characters],
+            "turns": [asdict(t) for t in self.turns],
+            "caption": self.caption,
+            "hashtags": self.hashtags,
+        }
+
+    def save_sidecar(self, directory: str | pathlib.Path, stem: str) -> pathlib.Path:
+        directory = pathlib.Path(directory)
+        directory.mkdir(parents=True, exist_ok=True)
+        (directory / f"{stem}.json").write_text(
+            json.dumps(self.to_dict(), ensure_ascii=False, indent=2), encoding="utf-8"
+        )
+        txt = directory / f"{stem}.txt"
+        txt.write_text(self.caption_text(), encoding="utf-8")
+        return txt

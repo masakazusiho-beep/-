@@ -20,3 +20,11 @@ output_dir = "drafts"       # 生成記事の保存先
 [note]
 publish = false             # false = 下書きまで（推奨）
 headless = true
+
+[tiktok]
+style = "dialogue"          # "dialogue"=会話形式（材料キャラの掛け合い） / "plain"=テロップのみ
+target_seconds = 30
+voice = "ja-JP-NanamiNeural"   # キャラ1（女性）
+voice_b = "ja-JP-KeitaNeural"  # キャラ2（男性）
+bg_color = "#111827"
+text_color = "#FFFFFF"

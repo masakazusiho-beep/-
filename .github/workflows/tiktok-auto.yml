@@ -23,10 +23,10 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install ffmpeg and Japanese fonts
+      - name: Install ffmpeg and Japanese / emoji fonts
         run: |
           sudo apt-get update
-          sudo apt-get install -y ffmpeg fonts-noto-cjk
+          sudo apt-get install -y ffmpeg fonts-noto-cjk fonts-noto-color-emoji
 
       - name: Install
         run: pip install -e ".[tiktok]"

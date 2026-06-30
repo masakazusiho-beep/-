@@ -9,8 +9,9 @@ import subprocess
 from .config import TikTokConfig
 
 
-def synthesize(text: str, out_path: str | pathlib.Path, cfg: TikTokConfig) -> pathlib.Path:
-    """text を読み上げた MP3 を out_path に書き出す."""
+def synthesize(text: str, out_path: str | pathlib.Path, cfg: TikTokConfig,
+               voice: str | None = None) -> pathlib.Path:
+    """text を読み上げた MP3 を out_path に書き出す（voice で声を上書き可）."""
     try:
         import edge_tts
     except ModuleNotFoundError as exc:  # pragma: no cover
@@ -20,7 +21,7 @@ def synthesize(text: str, out_path: str | pathlib.Path, cfg: TikTokConfig) -> pa
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
     async def _run() -> None:
-        communicate = edge_tts.Communicate(text, cfg.voice, rate=cfg.speech_rate)
+        communicate = edge_tts.Communicate(text, voice or cfg.voice, rate=cfg.speech_rate)
         await communicate.save(str(out_path))
 
     asyncio.run(_run())
