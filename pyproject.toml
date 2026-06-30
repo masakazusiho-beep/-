@@ -13,9 +13,11 @@ keywords = ["ooda", "decision-loop", "control-loop", "boyd"]
 
 [project.optional-dependencies]
 test = ["pytest>=7.0"]
+# note 記事の自動化パイプライン (note_auto) を使う場合の依存
+note = ["anthropic>=0.40", "playwright>=1.40"]
 
 [tool.setuptools]
-packages = ["ooda"]
+packages = ["ooda", "note_auto"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

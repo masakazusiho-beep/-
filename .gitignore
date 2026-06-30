@@ -6,3 +6,8 @@ build/
 dist/
 .venv/
 venv/
+
+# note_auto: 生成物・ローカル設定（機密を含みうる）
+drafts/
+note_config.toml
+.env

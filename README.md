@@ -79,3 +79,9 @@ python -m examples.thermostat
 ```bash
 python -m pytest
 ```
+
+## Also in this repo
+
+- [`note_auto/`](note_auto/README.md) — a pipeline that automates note.com articles
+  end to end (idea research → article generation with Claude → draft posting via
+  Playwright → scheduled runs).

@@ -1,0 +1,26 @@
+# note_auto 設定ファイルのサンプル。
+# コピーして note_config.toml を作り、内容を編集して使ってください。
+# 機密情報（API キー・note のログイン情報）はここには書かず、環境変数で渡します。
+
+[content]
+theme = "個人開発と生産性"
+keywords = ["AI活用", "自動化", "副業"]
+tone = "親しみやすく、具体例を交えた丁寧な語り口"
+target_chars = 2000
+default_tags = ["AI", "個人開発"]
+
+[generation]
+model = "claude-opus-4-8"   # 最新かつ高性能な既定モデル
+effort = "high"             # low | medium | high | max
+
+[output]
+output_dir = "drafts"       # 生成記事の保存先
+
+[note]
+publish = false             # false=下書き保存まで（推奨） / true=公開
+headless = true             # CI では true、デバッグ時は false で画面確認
+
+# --- 環境変数で渡すもの（このファイルには書かない）---
+# export ANTHROPIC_API_KEY=sk-ant-...   # 記事生成用
+# export NOTE_EMAIL=you@example.com     # note ログイン
+# export NOTE_PASSWORD=********          # note ログイン
