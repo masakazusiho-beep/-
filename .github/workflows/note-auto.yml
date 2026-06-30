@@ -52,11 +52,16 @@ jobs:
         if: steps.save.outputs.created == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OWNER: ${{ github.repository_owner }}
         run: |
           file='${{ steps.save.outputs.file }}'
           name=$(basename "$file" .md)
-          body=$(printf '🎉 今日の note 記事ができました！\n\n下のリンクをタップすると読めます👇\n\nhttps://github.com/%s/blob/main/%s\n\nコピーして note に貼ってください。' "${{ github.repository }}" "$file")
-          gh issue create --title "☕ 今日のnote記事ができました: $name" --body "$body"
+          # @メンション＋担当者に指定して、本人へ確実に通知が届くようにする
+          body=$(printf '@%s\n\n🎉 今日の note 記事ができました！\n\n下のリンクをタップすると読めます👇\n\nhttps://github.com/%s/blob/main/%s\n\nコピーして note に貼ってください。' "$OWNER" "${{ github.repository }}" "$file")
+          gh issue create \
+            --title "☕ 今日のnote記事ができました: $name" \
+            --body "$body" \
+            --assignee "$OWNER"
 
       - name: Upload drafts (backup)
         uses: actions/upload-artifact@v4
