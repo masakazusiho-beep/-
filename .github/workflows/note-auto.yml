@@ -10,6 +10,9 @@ on:
     - cron: "0 0 * * 1"   # 毎週月曜 09:00 JST（UTC 00:00）
   workflow_dispatch:       # 手動実行も可能
 
+permissions:
+  contents: write          # 生成した記事をリポジトリに保存（コミット）するため
+
 jobs:
   generate:
     runs-on: ubuntu-latest
@@ -29,7 +32,19 @@ jobs:
         run: |
           python -m note_auto run --config note_config.toml --count 1 --verbose
 
-      - name: Upload drafts
+      - name: Save articles into the repo (so you can read them on the website)
+        run: |
+          mkdir -p articles
+          cp drafts/*.md articles/ 2>/dev/null || true
+          if [ -n "$(git status --porcelain articles)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add articles
+            git commit -m "Add generated note article(s)"
+            git push
+          fi
+
+      - name: Upload drafts (backup)
         uses: actions/upload-artifact@v4
         with:
           name: note-drafts
