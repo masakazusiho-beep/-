@@ -1,0 +1,46 @@
+# note 記事を定期生成するワークフロー。
+# 既定はドライラン（生成→アーティファクト保存）で、安全に運用できます。
+# 自動で下書き保存まで行いたい場合は run コマンドに --post を付け、
+# NOTE_EMAIL / NOTE_PASSWORD を Secrets に設定してください。
+
+name: note-auto
+
+on:
+  schedule:
+    - cron: "0 0 * * 1"   # 毎週月曜 09:00 JST（UTC 00:00）
+  workflow_dispatch:       # 手動実行も可能
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install
+        run: pip install -e ".[note]"
+
+      - name: Generate drafts (dry-run)
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          python -m note_auto run --config note_config.toml --count 1 --verbose
+
+      - name: Upload drafts
+        uses: actions/upload-artifact@v4
+        with:
+          name: note-drafts
+          path: drafts/
+
+      # --- note へ下書き保存まで自動化したい場合（任意）---
+      # - name: Install browser
+      #   run: playwright install --with-deps chromium
+      # - name: Post drafts to note
+      #   env:
+      #     ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      #     NOTE_EMAIL: ${{ secrets.NOTE_EMAIL }}
+      #     NOTE_PASSWORD: ${{ secrets.NOTE_PASSWORD }}
+      #   run: python -m note_auto run --config note_config.toml --count 1 --post

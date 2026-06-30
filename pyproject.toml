@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ooda"
+version = "0.1.0"
+description = "A small, dependency-free implementation of Boyd's OODA loop."
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+keywords = ["ooda", "decision-loop", "control-loop", "boyd"]
+
+[project.optional-dependencies]
+test = ["pytest>=7.0"]
+# note 記事の自動化パイプライン (note_auto) を使う場合の依存
+note = ["anthropic>=0.40", "playwright>=1.40"]
+
+[tool.setuptools]
+packages = ["ooda", "note_auto"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
