@@ -8,7 +8,7 @@ from types import SimpleNamespace
 import pytest
 
 from note_auto.config import NoteAutoConfig, DEFAULT_MODEL
-from note_auto.generate import _split_body_and_meta, generate_article
+from note_auto.generate import _split_body_and_meta, _user_prompt, generate_article
 from note_auto.ideas import _extract_json, generate_ideas
 from note_auto.models import Article, Idea, _slugify
 
@@ -140,6 +140,14 @@ def test_split_body_and_meta_without_meta_uses_defaults():
     body, title, tags = _split_body_and_meta("本文のみ。", idea, cfg)
     assert title == "元タイトル"
     assert tags == ["既定"]
+
+
+def test_paid_prompt_includes_paywall_instructions():
+    idea = Idea(title="ネタ")
+    assert "🔒" not in _user_prompt(NoteAutoConfig(paid=False), idea)
+    paid = _user_prompt(NoteAutoConfig(paid=True), idea)
+    assert "🔒" in paid
+    assert "有料" in paid
 
 
 def test_generate_article_end_to_end():

@@ -34,6 +34,7 @@ class NoteAutoConfig:
     # --- 生成 ---
     model: str = DEFAULT_MODEL
     effort: str = "high"                              # low|medium|high|max
+    paid: bool = False                                # True で「有料記事」形式（無料部分→🔒→濃い本編）
 
     # --- 出力 ---
     output_dir: str = "drafts"
@@ -71,6 +72,7 @@ class NoteAutoConfig:
             default_tags=list(content.get("default_tags", [])),
             model=gen.get("model", DEFAULT_MODEL),
             effort=gen.get("effort", cls.effort),
+            paid=bool(gen.get("paid", False)),
             output_dir=out.get("output_dir", cls.output_dir),
             publish=bool(note.get("publish", False)),
             headless=bool(note.get("headless", True)),

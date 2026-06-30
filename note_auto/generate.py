@@ -31,21 +31,31 @@ def _system_prompt(cfg: NoteAutoConfig) -> str:
 
 def _user_prompt(cfg: NoteAutoConfig, idea: Idea) -> str:
     kw = "、".join(idea.keywords) if idea.keywords else "（指定なし）"
-    return "\n".join(
-        [
-            f"次のネタで note 記事を書いてください。",
-            f"- タイトル案: {idea.title}",
-            f"- 切り口: {idea.angle or '指定なし'}",
-            f"- キーワード: {kw}",
-            f"- 目安の文字数: {cfg.target_chars} 字前後",
+    lines = [
+        f"次のネタで note 記事を書いてください。",
+        f"- タイトル案: {idea.title}",
+        f"- 切り口: {idea.angle or '指定なし'}",
+        f"- キーワード: {kw}",
+        f"- 目安の文字数: {cfg.target_chars} 字前後",
+    ]
+    if cfg.paid:
+        lines += [
             "",
-            "本文は Markdown 本文のみ（記事タイトルの見出しは付けない）。",
-            "本文の最後に、メタ情報を次の形式の JSON コードブロックで1つだけ付けてください:",
-            '```json',
-            '{"title": "最終タイトル", "tags": ["タグ1", "タグ2", "タグ3"]}',
-            '```',
+            "【有料記事の構成にすること】",
+            "- 冒頭の無料部分で読者を引き込み、『結論』までは見せる。",
+            "- そのあと「🔒 ここから先は有料記事です」という見出しで区切る。",
+            "- 有料部分は、具体的な数字・選び方・手順など『お金を払う価値』のある濃い内容にする。",
+            "- 後半に『予算別の表』か『チェックリスト』を必ず1つ入れる。",
         ]
-    )
+    lines += [
+        "",
+        "本文は Markdown 本文のみ（記事タイトルの見出しは付けない）。",
+        "本文の最後に、メタ情報を次の形式の JSON コードブロックで1つだけ付けてください:",
+        '```json',
+        '{"title": "最終タイトル", "tags": ["タグ1", "タグ2", "タグ3"]}',
+        '```',
+    ]
+    return "\n".join(lines)
 
 
 def _split_body_and_meta(text: str, idea: Idea, cfg: NoteAutoConfig) -> tuple[str, str, list[str]]:
