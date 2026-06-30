@@ -6,9 +6,9 @@ import json
 from types import SimpleNamespace
 
 from tiktok_auto.config import TikTokConfig, DEFAULT_MODEL
-from tiktok_auto.models import VideoScript, Scene, slugify
+from tiktok_auto.models import VideoScript, Scene, slugify, DialogueScript, Character, DialogueTurn
 from tiktok_auto.render import wrap_text
-from tiktok_auto.script import parse_script, generate_script
+from tiktok_auto.script import parse_script, generate_script, parse_dialogue
 
 
 def test_config_loads_theme_from_content(tmp_path):
@@ -70,6 +70,56 @@ def test_save_sidecar(tmp_path):
     assert txt.exists()
     data = json.loads((tmp_path / f"{stem}.json").read_text(encoding="utf-8"))
     assert data["hook"] == "フック"
+
+
+def test_config_style_dialogue_from_toml(tmp_path):
+    toml = tmp_path / "c.toml"
+    toml.write_text('[tiktok]\nstyle = "dialogue"\nvoice_b = "ja-JP-KeitaNeural"\n', encoding="utf-8")
+    cfg = TikTokConfig.load(toml)
+    assert cfg.style == "dialogue"
+    assert cfg.voice_b == "ja-JP-KeitaNeural"
+
+
+def test_parse_dialogue():
+    payload = {
+        "title": "バターは溶かすな",
+        "characters": [
+            {"name": "バターさん", "emoji": "🧈"},
+            {"name": "たまごさん", "emoji": "🥚"},
+        ],
+        "turns": [
+            {"speaker": 0, "line": "ねえ、僕を溶かさないで！"},
+            {"speaker": 1, "line": "えっ、なんで？"},
+        ],
+        "caption": "知ってた？",
+        "hashtags": ["お菓子作り", "製菓"],
+    }
+    s = parse_dialogue(json.dumps(payload, ensure_ascii=False))
+    assert s.title == "バターは溶かすな"
+    assert len(s.characters) == 2
+    assert s.characters[0].emoji == "🧈"
+    assert [t.speaker for t in s.turns] == [0, 1]
+
+
+def test_parse_dialogue_clamps_speaker_index():
+    payload = {
+        "title": "T", "characters": [{"name": "A", "emoji": ""}, {"name": "B", "emoji": ""}],
+        "turns": [{"speaker": 5, "line": "x"}], "caption": "", "hashtags": [],
+    }
+    s = parse_dialogue(json.dumps(payload, ensure_ascii=False))
+    assert s.turns[0].speaker == 1  # 0/1 に丸められる
+
+
+def test_dialogue_sidecar(tmp_path):
+    s = DialogueScript(
+        title="T", characters=[Character("A", "🧈"), Character("B", "🥚")],
+        turns=[DialogueTurn(0, "やあ")], caption="c", hashtags=["t"],
+    )
+    stem = VideoScript.default_stem(s.title)
+    txt = s.save_sidecar(tmp_path, stem)
+    assert txt.exists()
+    data = json.loads((tmp_path / f"{stem}.json").read_text(encoding="utf-8"))
+    assert data["characters"][0]["emoji"] == "🧈"
 
 
 def test_generate_script_with_fake_client():
