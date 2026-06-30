@@ -27,7 +27,7 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
-          python -m note_auto run --config note_config.toml --count 1 --research --verbose
+          python -m note_auto run --config note_config.toml --count 1 --verbose
 
       - name: Upload drafts
         uses: actions/upload-artifact@v4

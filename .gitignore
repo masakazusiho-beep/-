@@ -7,7 +7,6 @@ dist/
 .venv/
 venv/
 
-# note_auto: 生成物・ローカル設定（機密を含みうる）
+# note_auto: 生成物（機密は環境変数/Secrets で渡す）
 drafts/
-note_config.toml
 .env

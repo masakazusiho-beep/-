@@ -1,0 +1,22 @@
+# note_auto の設定ファイル（クラウド実行で使われます）。
+# ★テーマやキーワードを変えたいときは、ここを GitHub の画面で編集すればOK。
+# ★パスワードや API キーは絶対にここに書かないこと（GitHub の Secrets に登録します）。
+
+[content]
+theme = "お菓子作りの専門知識"
+keywords = ["お菓子作り", "製菓", "初心者"]
+tone = "親しみやすく、初心者にもわかりやすい丁寧な語り口"
+target_chars = 2500
+default_tags = ["お菓子作り", "製菓", "初心者"]
+
+[generation]
+model = "claude-opus-4-8"   # 記事を書くAIモデル
+effort = "high"             # low | medium | high | max
+paid = true                 # true = 有料記事の形（無料→🔒→濃い本編＋表/チェックリスト）
+
+[output]
+output_dir = "drafts"       # 生成記事の保存先
+
+[note]
+publish = false             # false = 下書きまで（推奨）
+headless = true
