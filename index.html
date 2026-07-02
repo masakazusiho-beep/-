@@ -2,8 +2,20 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
 <title>Star Drifter — アーケードシューティング</title>
+
+<!-- PWA: installable "app-like" experience -->
+<link rel="manifest" href="manifest.webmanifest" />
+<meta name="theme-color" content="#060912" />
+<meta name="description" content="隕石を撃ち落として生き残るアーケードシューティング。" />
+<!-- iOS: home-screen web app -->
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Star Drifter" />
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+<link rel="icon" type="image/png" href="icons/icon-192.png" />
 <style>
   :root {
     --bg: #060912;
@@ -21,14 +33,31 @@
     display: flex; align-items: center; justify-content: center;
     height: 100vh;
   }
-  #wrap { position: relative; }
+  body {
+    padding: env(safe-area-inset-top) env(safe-area-inset-right)
+             env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+  #wrap {
+    position: relative;
+    /* Scale the 480x640 board to fit the viewport, keeping aspect ratio. */
+    width: min(480px, 100vw, calc((100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom)) * 0.75));
+    aspect-ratio: 480 / 640;
+  }
   canvas {
     display: block;
+    width: 100%; height: 100%;
     background: #060912;
     border: 1px solid rgba(120,150,220,0.25);
     border-radius: 14px;
     box-shadow: 0 20px 60px rgba(0,0,0,0.55);
     touch-action: none;
+  }
+  /* In installed/standalone mode fill the whole screen edge-to-edge. */
+  @media (display-mode: standalone) {
+    #wrap {
+      width: min(100vw, calc((100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom)) * 0.75));
+    }
+    canvas { border: none; border-radius: 0; }
   }
   .hud {
     position: absolute; top: 14px; left: 16px; right: 16px;
@@ -366,6 +395,13 @@
   reset();
   loop();
 })();
+
+// Register the service worker so the game works offline and is installable.
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", function () {
+    navigator.serviceWorker.register("sw.js").catch(function () {});
+  });
+}
 </script>
 </body>
 </html>
