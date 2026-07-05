@@ -1,0 +1,19 @@
+{
+  "name": "ベーカーズ％ノート",
+  "short_name": "ベーカーズ％",
+  "description": "製菓レシピをベーカーズ％に変換し、倍率や粉の目標量で自動スケール。レシピを保存できます。",
+  "lang": "ja",
+  "start_url": "./",
+  "scope": "./",
+  "id": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F3EEE6",
+  "theme_color": "#B5701C",
+  "icons": [
+    { "src": "icons/icon.svg", "type": "image/svg+xml", "sizes": "any", "purpose": "any" },
+    { "src": "icons/icon-192.png", "type": "image/png", "sizes": "192x192", "purpose": "any" },
+    { "src": "icons/icon-512.png", "type": "image/png", "sizes": "512x512", "purpose": "any" },
+    { "src": "icons/icon-512.png", "type": "image/png", "sizes": "512x512", "purpose": "maskable" }
+  ]
+}

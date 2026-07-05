@@ -85,3 +85,5 @@ python -m pytest
 - [`note_auto/`](note_auto/README.md) — a pipeline that automates note.com articles
   end to end (idea research → article generation with Claude → draft posting via
   Playwright → scheduled runs).
+- [`bakers-note/`](bakers-note/README.md) — ベーカーズ％ノート: 製菓レシピをベーカーズ％に
+  変換・スケールする PWA（ホーム画面に追加可能、GitHub Pages で公開）。

@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="ベーカーズ％ノート">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#CE8A31"/>
+      <stop offset="1" stop-color="#96500E"/>
+    </linearGradient>
+    <linearGradient id="cream" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FBF3E2"/>
+      <stop offset="1" stop-color="#F3E3C4"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="512" height="512" fill="url(#bg)"/>
+
+  <!-- wheat ears, subtle -->
+  <g fill="#E7C87F" opacity="0.28">
+    <ellipse cx="120" cy="120" rx="16" ry="34" transform="rotate(-32 120 120)"/>
+    <ellipse cx="150" cy="96"  rx="16" ry="34" transform="rotate(-32 150 96)"/>
+    <ellipse cx="392" cy="392" rx="16" ry="34" transform="rotate(-32 392 392)"/>
+    <ellipse cx="362" cy="416" rx="16" ry="34" transform="rotate(-32 362 416)"/>
+  </g>
+
+  <!-- percent mark -->
+  <g fill="url(#cream)">
+    <circle cx="188" cy="196" r="46"/>
+    <circle cx="324" cy="316" r="46"/>
+    <rect x="238" y="118" width="40" height="292" rx="20" transform="rotate(34 256 256)"/>
+  </g>
+  <g fill="#B5701C">
+    <circle cx="188" cy="196" r="20"/>
+    <circle cx="324" cy="316" r="20"/>
+  </g>
+</svg>
