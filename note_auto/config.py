@@ -30,6 +30,7 @@ class NoteAutoConfig:
     tone: str = "親しみやすく、具体例を交えた丁寧な語り口"
     target_chars: int = 2000                          # 目安文字数
     default_tags: List[str] = field(default_factory=list)
+    extra_guidance: str = ""                           # プレイブックに追記する任意の方針（TOML で編集可）
 
     # --- 生成 ---
     model: str = DEFAULT_MODEL
@@ -70,6 +71,7 @@ class NoteAutoConfig:
             tone=content.get("tone", cls.tone),
             target_chars=int(content.get("target_chars", cls.target_chars)),
             default_tags=list(content.get("default_tags", [])),
+            extra_guidance=content.get("extra_guidance", ""),
             model=gen.get("model", DEFAULT_MODEL),
             effort=gen.get("effort", cls.effort),
             paid=bool(gen.get("paid", False)),

@@ -14,19 +14,24 @@ import anthropic
 
 from .config import NoteAutoConfig
 from .models import Article, Idea
+from .playbook import article_guidance
 
 # タイトルとタグを末尾の JSON フェンスで受け取り、本文と分離する。
 _META_RE = re.compile(r"```json\s*(\{.*?\})\s*```\s*$", re.DOTALL)
 
 
 def _system_prompt(cfg: NoteAutoConfig) -> str:
-    return (
+    base = (
         "あなたはプロの note ライターです。読者の心に残り、最後まで読まれる記事を書きます。"
         f"文体は「{cfg.tone}」。"
         "Markdown で、適切な見出し(##)・箇条書き・強調を使って読みやすく構成してください。"
         "導入で関心を引き、本文で具体的な価値を届け、結びで行動や余韻を残します。"
         "AI が書いたとわかる紋切り型の言い回しや過度な定型句は避けてください。"
     )
+    parts = [base, article_guidance()]
+    if cfg.extra_guidance:
+        parts.append("【追加の方針】\n" + cfg.extra_guidance)
+    return "\n\n".join(parts)
 
 
 def _user_prompt(cfg: NoteAutoConfig, idea: Idea) -> str:
