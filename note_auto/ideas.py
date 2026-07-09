@@ -13,6 +13,7 @@ import anthropic
 
 from .config import NoteAutoConfig
 from .models import Idea
+from .playbook import idea_guidance
 
 # web 検索の最新バリアント（Opus 4.8 対応）。動的フィルタリング内蔵。
 _WEB_SEARCH_TOOL = {"type": "web_search_20260209", "name": "web_search"}
@@ -52,7 +53,11 @@ def _build_prompt(cfg: NoteAutoConfig, count: int, research: bool) -> str:
         "- angle: 記事の切り口・読者が得る価値",
         "- keywords: SEO/検索を意識したキーワード 3〜5 個",
         "- rationale: なぜ今このネタが刺さるのか（根拠・トレンド）",
+        "",
+        idea_guidance(),
     ]
+    if cfg.extra_guidance:
+        lines += ["", "【追加の方針】", cfg.extra_guidance]
     if research:
         lines += [
             "",
