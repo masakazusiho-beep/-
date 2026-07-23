@@ -9,8 +9,9 @@ import pytest
 
 from note_auto.config import NoteAutoConfig, DEFAULT_MODEL
 from note_auto.generate import _split_body_and_meta, _user_prompt, generate_article
-from note_auto.ideas import _extract_json, generate_ideas
+from note_auto.ideas import _extract_json, _build_prompt, generate_ideas
 from note_auto.models import Article, Idea, _slugify
+from note_auto.pipeline import collect_past_titles
 
 
 # ---------- フェイクの Claude クライアント ----------
@@ -104,6 +105,22 @@ def test_require_credentials_raises_when_missing(monkeypatch):
 def test_extract_json_from_noisy_text():
     text = 'ここに提案です:\n{"ideas": [{"title": "x"}]}\nどうぞ。'
     assert _extract_json(text)["ideas"][0]["title"] == "x"
+
+
+def test_build_prompt_includes_avoid_titles():
+    p = _build_prompt(NoteAutoConfig(theme="お菓子"), count=3, research=False,
+                      avoid_titles=["既出タイトルA", "既出タイトルB"])
+    assert "既出タイトルA" in p
+    assert "かぶらない" in p
+    # カテゴリ分散の指示も入る
+    assert "カテゴリ" in p
+
+
+def test_collect_past_titles(tmp_path):
+    (tmp_path / "2026-01-01-foo.md").write_text("# 記事タイトル1\n\n本文", encoding="utf-8")
+    (tmp_path / "2026-01-02-bar.md").write_text("# 記事タイトル2\n\n本文", encoding="utf-8")
+    titles = collect_past_titles(str(tmp_path), str(tmp_path / "missing"))
+    assert titles == ["記事タイトル1", "記事タイトル2"]
 
 
 def test_generate_ideas_structured():

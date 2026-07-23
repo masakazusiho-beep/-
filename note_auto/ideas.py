@@ -41,12 +41,37 @@ _IDEA_SCHEMA = {
 }
 
 
-def _build_prompt(cfg: NoteAutoConfig, count: int, research: bool) -> str:
+# ネタが似通わないように、毎回いろんな角度から選ばせる
+_CATEGORIES = [
+    "具体的なレシピ・作り方",
+    "道具・材料の選び方",
+    "材料や工程の科学（なぜそうなるか）",
+    "よくある失敗とトラブル解決",
+    "季節・イベント（旬の素材や行事）",
+    "ラッピング・見た目・盛り付け",
+    "時短・作り置き・保存のコツ",
+    "販売・プレゼント・ギフト向け",
+    "健康・アレルギー配慮・代替材料",
+]
+
+
+def _build_prompt(
+    cfg: NoteAutoConfig,
+    count: int,
+    research: bool,
+    avoid_titles: List[str] | None = None,
+) -> str:
     kw = "、".join(cfg.keywords) if cfg.keywords else "（指定なし）"
+    cats = "、".join(_CATEGORIES)
     lines = [
         f"あなたは note の人気クリエイターの編集パートナーです。",
         f"テーマ「{cfg.theme or '指定なし'}」に沿って、読者の役に立つ記事ネタを {count} 個提案してください。",
         f"重視キーワード: {kw}",
+        "",
+        "【毎回ちがうネタにするための指示】",
+        f"- 次のカテゴリの中からできるだけ違うものを選び、切り口を散らしてください: {cats}",
+        "- ありがちな『初心者向けの失敗防止』ばかりに寄らず、レシピ・季節もの・道具・販売など幅広く。",
+        "- タイトルの言い回しや構成もワンパターンにしないこと。",
         "",
         "各ネタには次を含めてください:",
         "- title: 思わずクリックしたくなる具体的な日本語タイトル",
@@ -56,6 +81,13 @@ def _build_prompt(cfg: NoteAutoConfig, count: int, research: bool) -> str:
         "",
         idea_guidance(),
     ]
+    if avoid_titles:
+        recent = "\n".join(f"- {t}" for t in avoid_titles[:40])
+        lines += [
+            "",
+            "【重要】次はすでに書いた記事です。テーマ・切り口が“かぶらない”ようにしてください:",
+            recent,
+        ]
     if cfg.extra_guidance:
         lines += ["", "【追加の方針】", cfg.extra_guidance]
     if research:
@@ -84,10 +116,14 @@ def generate_ideas(
     count: int = 5,
     research: bool = False,
     client: anthropic.Anthropic | None = None,
+    avoid_titles: List[str] | None = None,
 ) -> List[Idea]:
-    """記事ネタを `count` 個生成して返す."""
+    """記事ネタを `count` 個生成して返す.
+
+    avoid_titles に過去記事のタイトルを渡すと、それらと被らないネタを出す。
+    """
     client = client or anthropic.Anthropic()
-    prompt = _build_prompt(cfg, count, research)
+    prompt = _build_prompt(cfg, count, research, avoid_titles=avoid_titles)
 
     if research:
         # web 検索ツールと併用するため、構造化出力ではなく JSON 指示＋抽出で対応。
