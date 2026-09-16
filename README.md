@@ -87,3 +87,5 @@ python -m pytest
   Playwright → scheduled runs).
 - [`bakers-note/`](bakers-note/README.md) — ベーカーズ％ノート: 製菓レシピをベーカーズ％に
   変換・スケールする PWA（ホーム画面に追加可能、GitHub Pages で公開）。
+- [`stock-board/`](stock-board/README.md) — ストックボード: お店の冷凍・冷蔵・常温の在庫を
+  場所ごとに数えて要発注リストをコピーできる PWA（GitHub Pages で公開）。

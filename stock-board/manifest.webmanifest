@@ -1,0 +1,19 @@
+{
+  "name": "ストックボード",
+  "short_name": "ストック",
+  "description": "お店の冷凍・冷蔵・常温の在庫を場所ごとに数えて、要発注リストをコピーできる在庫アプリ。",
+  "lang": "ja",
+  "start_url": "./",
+  "scope": "./",
+  "id": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F1F4F6",
+  "theme_color": "#2B5F7B",
+  "icons": [
+    { "src": "icons/icon.svg", "type": "image/svg+xml", "sizes": "any", "purpose": "any" },
+    { "src": "icons/icon-192.png", "type": "image/png", "sizes": "192x192", "purpose": "any" },
+    { "src": "icons/icon-512.png", "type": "image/png", "sizes": "512x512", "purpose": "any" },
+    { "src": "icons/icon-512.png", "type": "image/png", "sizes": "512x512", "purpose": "maskable" }
+  ]
+}
