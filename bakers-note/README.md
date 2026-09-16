@@ -16,7 +16,7 @@
 2. GitHub のリポジトリ → **Settings → Pages** を開く。
 3. **Build and deployment → Source** を **「GitHub Actions」** に設定。
 4. `main` への push で `.github/workflows/deploy.yml` が走り、数分で公開URLが出ます。
-   - URL の目安：`https://<ユーザー名>.github.io/<リポジトリ名>/`
+   - URL の目安：`https://<ユーザー名>.github.io/<リポジトリ名>/bakers-note/`（トップページにアプリ一覧が出ます）
 
 ## ホーム画面に追加
 - **iPhone (Safari)**：公開URLを開く → 共有ボタン → 「ホーム画面に追加」

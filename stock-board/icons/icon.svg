@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="ストックボード">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3A7BA0"/>
+      <stop offset="1" stop-color="#1B3F55"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#bg)"/>
+  <!-- stacked crates -->
+  <g fill="#F1F4F6">
+    <rect x="96"  y="292" width="140" height="120" rx="14"/>
+    <rect x="276" y="292" width="140" height="120" rx="14"/>
+    <rect x="186" y="150" width="140" height="120" rx="14"/>
+  </g>
+  <g fill="#2B5F7B" opacity=".9">
+    <rect x="146" y="292" width="40" height="34" rx="6"/>
+    <rect x="326" y="292" width="40" height="34" rx="6"/>
+    <rect x="236" y="150" width="40" height="34" rx="6"/>
+  </g>
+  <!-- count badge -->
+  <circle cx="404" cy="124" r="52" fill="#F0B658"/>
+  <text x="404" y="143" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-weight="700" font-size="58" fill="#1B3F55">9</text>
+</svg>
