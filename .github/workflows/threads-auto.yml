@@ -1,0 +1,76 @@
+# Threads 投稿を定期生成するワークフロー。
+# 既定は「下書き生成」のみ（threads-drafts/ に保存して通知）。安全に運用できます。
+# Threads へ自動投稿したい場合は run に --post を付け、
+# THREADS_USER_ID / THREADS_TOKEN を Secrets に設定してください。
+
+name: threads-auto
+
+on:
+  schedule:
+    - cron: "0 21 * * *"   # 毎朝 06:00 JST（UTC 21:00）に実行
+  workflow_dispatch:       # 手動実行も可能
+
+permissions:
+  contents: write          # 生成した投稿をリポジトリに保存（コミット）するため
+  issues: write            # 投稿完成のお知らせ（Issue）を作るため
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install
+        run: pip install -e ".[threads-auto]"
+
+      - name: Generate posts (draft only)
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          python -m threads_auto run --config threads_config.toml --count 3 --verbose
+
+      - name: Save posts into the repo
+        id: save
+        run: |
+          mkdir -p threads
+          cp threads-drafts/*.md threads/ 2>/dev/null || true
+          if [ -n "$(git status --porcelain threads)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add threads
+            git commit -m "Add generated Threads post(s)"
+            git push
+            echo "created=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Notify that today's posts are ready (お知らせを作る)
+        if: steps.save.outputs.created == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OWNER: ${{ github.repository_owner }}
+        run: |
+          body=$(printf '@%s\n\n🧵 今日の Threads 投稿の下書きができました！\n\n下のフォルダに入っています👇\n\nhttps://github.com/%s/tree/main/threads\n\n気に入ったものをコピーして Threads に貼ってください。' "$OWNER" "${{ github.repository }}")
+          gh issue create \
+            --title "🧵 今日のThreads投稿の下書きができました" \
+            --body "$body" \
+            --assignee "$OWNER"
+
+      - name: Upload drafts (backup)
+        uses: actions/upload-artifact@v4
+        with:
+          name: threads-drafts
+          path: threads-drafts/
+
+      # --- Threads へ自動投稿したい場合（任意）---
+      # 1) Meta で Threads API アプリを作り、THREADS_USER_ID / THREADS_TOKEN を Secrets に登録
+      # 2) threads_config.toml の [threads] publish = true にする（または下の --post を使う）
+      # - name: Post to Threads
+      #   env:
+      #     ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      #     THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
+      #     THREADS_TOKEN: ${{ secrets.THREADS_TOKEN }}
+      #   run: python -m threads_auto run --config threads_config.toml --count 3 --post
