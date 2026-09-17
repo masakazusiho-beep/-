@@ -17,9 +17,11 @@ test = ["pytest>=7.0"]
 note = ["anthropic>=0.40", "playwright>=1.40"]
 # TikTok 等のショート動画自動生成 (tiktok_auto) を使う場合の依存（要 ffmpeg）
 tiktok = ["anthropic>=0.40", "edge-tts>=6.1", "pillow>=10.0"]
+# Threads 投稿の自動生成 (threads_auto) を使う場合の依存
+threads-auto = ["anthropic>=0.40"]
 
 [tool.setuptools]
-packages = ["ooda", "note_auto", "tiktok_auto"]
+packages = ["ooda", "note_auto", "tiktok_auto", "threads_auto"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

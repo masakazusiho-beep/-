@@ -1,0 +1,23 @@
+# threads_auto の設定ファイル（クラウド実行で使われます）。
+# ★テーマや誘導先を変えたいときは、ここを GitHub の画面で編集すればOK。
+# ★パスワードやトークンは絶対にここに書かないこと（GitHub の Secrets に登録します）。
+
+[content]
+theme = "お菓子作りの日常・コツ・失敗談（お店の作り手目線）"
+keywords = ["お菓子作り", "製菓", "手作りお菓子", "おうちカフェ"]
+tone = "親しみやすく、共感を呼ぶカジュアルな語り口"
+max_chars = 500          # Threads の1投稿の上限
+cta_ratio = 0.4          # 一部の投稿にだけ誘導文を入れる
+# 誘導先（おすすめ道具ページ）。空なら「プロフィールのリンク」と表現する。
+page_url = "https://masakazusiho-beep.github.io/-/osusume/"
+
+[generation]
+model = "claude-haiku-4-5-20251001"   # 投稿は短いので軽量モデル＝低コスト
+
+[output]
+output_dir = "threads-drafts"
+
+[threads]
+# true にすると Threads へ自動投稿（要 Secrets: THREADS_USER_ID / THREADS_TOKEN）。
+# 既定は false（＝下書き生成のみ）。
+publish = false
