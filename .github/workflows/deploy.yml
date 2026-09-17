@@ -6,6 +6,7 @@ on:
     paths:
       - "bakers-note/**"
       - "stock-board/**"
+      - "osusume/**"
       - ".github/workflows/deploy.yml"
   workflow_dispatch:
 
@@ -33,6 +34,7 @@ jobs:
           mkdir -p _site
           cp -r bakers-note _site/bakers-note
           cp -r stock-board _site/stock-board
+          cp -r osusume _site/osusume
           touch _site/.nojekyll
           cat > _site/index.html <<'EOF'
           <!doctype html>
@@ -60,6 +62,7 @@ jobs:
             <p>開いて「ホーム画面に追加」すると、アプリのように使えます。</p>
             <a class="app" href="stock-board/"><img src="stock-board/icons/icon.svg" alt=""><div><b>ストックボード</b><span>お店の在庫を場所ごとに数えて、発注リストをコピー</span></div></a>
             <a class="app" href="bakers-note/"><img src="bakers-note/icons/icon.svg" alt=""><div><b>ベーカーズ％ノート</b><span>製菓レシピをベーカーズ％に変換・スケール</span></div></a>
+            <a class="app" href="osusume/"><img src="osusume/icons/icon.svg" alt=""><div><b>おすすめ道具</b><span>お菓子作りのおすすめ道具・材料まとめ</span></div></a>
           </main>
           </body>
           </html>

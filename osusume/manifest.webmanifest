@@ -1,0 +1,16 @@
+{
+  "name": "お菓子作りのおすすめ道具",
+  "short_name": "おすすめ道具",
+  "description": "実際に使ってよかった、お菓子作りのおすすめ道具・材料をまとめたページ。",
+  "lang": "ja",
+  "start_url": "./",
+  "scope": "./",
+  "id": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F1EADD",
+  "theme_color": "#C1772B",
+  "icons": [
+    { "src": "icons/icon.svg", "type": "image/svg+xml", "sizes": "any", "purpose": "any" }
+  ]
+}

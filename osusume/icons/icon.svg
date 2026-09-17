@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="おすすめ道具">
+  <rect width="512" height="512" rx="112" fill="#C1772B"/>
+  <!-- shopping bag -->
+  <path d="M150 196 h212 a16 16 0 0 1 16 15.4 l14 200 a20 20 0 0 1 -20 21.6 H140 a20 20 0 0 1 -20 -21.6 l14 -200 A16 16 0 0 1 150 196 Z" fill="#FBF7F0"/>
+  <!-- handles -->
+  <path d="M196 210 v-24 a60 60 0 0 1 120 0 v24" fill="none" stroke="#FBF7F0" stroke-width="22" stroke-linecap="round"/>
+  <!-- heart -->
+  <path d="M256 356 c-40 -28 -60 -50 -60 -78 a30 30 0 0 1 60 -10 a30 30 0 0 1 60 10 c0 28 -20 50 -60 78 Z" fill="#C1772B"/>
+</svg>
