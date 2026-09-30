@@ -6,9 +6,10 @@
 name: threads-auto
 
 on:
-  schedule:
-    - cron: "0 21 * * *"   # 毎朝 06:00 JST（UTC 21:00）に実行
-  workflow_dispatch:       # 手動実行も可能
+  # ★2026-09-30〜 一時停止中。再開したいときは下の schedule 行の # を外してください。
+  # schedule:
+  #   - cron: "0 21 * * *"   # 毎朝 06:00 JST（UTC 21:00）に実行
+  workflow_dispatch:       # 手動実行は引き続き可能
 
 permissions:
   contents: write          # 生成した投稿をリポジトリに保存（コミット）するため
