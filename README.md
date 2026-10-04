@@ -89,3 +89,5 @@ python -m pytest
   変換・スケールする PWA（ホーム画面に追加可能、GitHub Pages で公開）。
 - [`stock-board/`](stock-board/README.md) — ストックボード: お店の冷凍・冷蔵・常温の在庫を
   場所ごとに数えて要発注リストをコピーできる PWA（GitHub Pages で公開）。
+- [`recipe-book/`](recipe-book/README.md) — レシピ帳: 料理名・材料欄のテンプレに Apple Pencil
+  で自由に書き込める手書きノート PWA。料理／デザート／ドリンクで分類（GitHub Pages で公開）。

@@ -1,0 +1,19 @@
+{
+  "name": "レシピ帳",
+  "short_name": "レシピ帳",
+  "description": "料理名・材料欄のテンプレに、Apple Pencilで自由に書き込めるレシピ帳。料理・デザート・ドリンクで分類。",
+  "lang": "ja",
+  "start_url": "./",
+  "scope": "./",
+  "id": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#FBF6EC",
+  "theme_color": "#C9663D",
+  "icons": [
+    { "src": "icons/icon.svg", "type": "image/svg+xml", "sizes": "any", "purpose": "any" },
+    { "src": "icons/icon-192.png", "type": "image/png", "sizes": "192x192", "purpose": "any" },
+    { "src": "icons/icon-512.png", "type": "image/png", "sizes": "512x512", "purpose": "any" },
+    { "src": "icons/icon-512.png", "type": "image/png", "sizes": "512x512", "purpose": "maskable" }
+  ]
+}
