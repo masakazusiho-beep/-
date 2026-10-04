@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>レシピ帳</title>
+<meta name="description" content="料理名・材料欄のテンプレに、Apple Pencilで自由に書き込めるレシピ帳。料理・デザート・ドリンクで分類。">
+<meta name="theme-color" content="#C9663D" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1B1612" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="レシピ帳">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&family=Zen+Maru+Gothic:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ===== library ===== -->
+<section id="libView">
+  <header class="top">
+    <div class="wrap">
+      <div class="brand">
+        <img class="logo" src="icons/icon.svg" alt="" width="36" height="36">
+        <h1>レシピ帳</h1>
+      </div>
+      <button class="icon-btn" id="themeBtn" aria-label="表示テーマ切替">◑</button>
+    </div>
+  </header>
+  <main class="wrap">
+    <div class="search">
+      <span aria-hidden="true">🔍</span>
+      <input id="q" type="search" placeholder="レシピ名で検索" autocomplete="off">
+    </div>
+    <div class="chips" id="catChips" role="group" aria-label="分類で絞り込み">
+      <button class="chip on" data-cat="all">すべて</button>
+      <button class="chip dish" data-cat="dish">🍳 料理</button>
+      <button class="chip dessert" data-cat="dessert">🍰 デザート</button>
+      <button class="chip drink" data-cat="drink">🥤 ドリンク</button>
+    </div>
+    <div class="grid" id="grid"></div>
+    <div class="libtools">
+      <button class="text-btn" id="exportBtn">💾 書き出し</button>
+      <button class="text-btn" id="importBtn">📂 読み込み</button>
+      <input type="file" id="importFile" accept="application/json,.json" hidden>
+    </div>
+  </main>
+  <button class="fab" id="addBtn" aria-label="新しいレシピ">＋</button>
+</section>
+
+<!-- ===== editor ===== -->
+<section id="edView" hidden>
+  <header class="top ed">
+    <div class="wrap">
+      <button class="icon-btn" id="backBtn" aria-label="一覧へ戻る">‹</button>
+      <div class="ed-chips" id="catPicker" role="group" aria-label="分類">
+        <button class="chip dish" data-cat="dish">🍳 料理</button>
+        <button class="chip dessert" data-cat="dessert">🍰 デザート</button>
+        <button class="chip drink" data-cat="drink">🥤 ドリンク</button>
+      </div>
+      <div class="ed-right">
+        <button class="icon-btn" id="moreBtn" aria-label="その他の操作">⋯</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="modebar">
+    <div class="wrap mb-row">
+      <div class="seg" role="group" aria-label="モード">
+        <button class="seg-btn on" data-mode="type">⌨️ 入力</button>
+        <button class="seg-btn" data-mode="draw">✏️ 書き込み</button>
+      </div>
+      <div class="pentools" id="pentools" hidden>
+        <div class="swatches" id="swatches" role="group" aria-label="ペンの色">
+          <button class="sw on" data-pen="ink" style="--c:#2B2520" aria-label="黒"></button>
+          <button class="sw" data-pen="red" style="--c:#C0392B" aria-label="赤"></button>
+          <button class="sw" data-pen="pencil" style="--c:#8A7F6E" aria-label="鉛筆"></button>
+          <button class="sw hi" data-pen="highlight" style="--c:#FFD400" aria-label="蛍光ペン"></button>
+        </div>
+        <button class="pt-btn" id="widthBtn" aria-label="太さ切替" title="太さ">細</button>
+        <button class="pt-btn" id="eraserBtn" aria-label="消しゴム" title="消しゴム">🧹</button>
+        <button class="pt-btn" id="undoBtn" aria-label="元に戻す" title="元に戻す">↩︎</button>
+        <button class="pt-btn ghost" id="fingerBtn" aria-label="指でも描ける 切替" title="指でも描ける">✍️ 指OFF</button>
+      </div>
+    </div>
+  </div>
+
+  <main class="stage" id="stage">
+    <div class="paper-wrap">
+      <div class="paper" id="paper">
+        <div class="rule-margin"></div>
+        <div class="paper-fields">
+          <div class="f-title">
+            <label for="titleIn">料理名</label>
+            <input id="titleIn" type="text" placeholder="レシピの名前">
+          </div>
+          <div class="f-ing">
+            <div class="f-ing-head">
+              <span>材料</span>
+              <button class="add-ing" id="addIngBtn">＋ 材料を追加</button>
+            </div>
+            <div id="ingList"></div>
+          </div>
+          <div class="memo-label">— メモ・手書き —</div>
+        </div>
+        <canvas id="ink" aria-label="手書きメモ"></canvas>
+      </div>
+      <button class="grow-btn" id="growBtn">＋ ページを伸ばす</button>
+    </div>
+  </main>
+</section>
+
+<div class="backdrop" id="moreBackdrop" hidden></div>
+<div class="sheet" id="moreSheet" hidden role="dialog" aria-modal="true">
+  <div class="grab"></div>
+  <button class="sheet-item" id="dupItem">⧉ 複製</button>
+  <button class="sheet-item danger" id="delItem">🗑 削除</button>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
