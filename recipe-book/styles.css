@@ -146,7 +146,7 @@ main.wrap{padding-block:16px 100px}
 .ing-del:active{background:var(--danger-soft);color:var(--danger)}
 .memo-label{font-size:11.5px;color:var(--muted);letter-spacing:.1em;text-align:center;margin-top:4px}
 
-canvas#ink{position:absolute;inset:0;width:100%;height:100%;z-index:2;touch-action:pan-y}
+canvas#ink{position:absolute;inset:0;width:100%;height:100%;z-index:2;touch-action:none}
 .paper.mode-type canvas#ink{pointer-events:none}
 .paper.mode-draw canvas#ink{pointer-events:auto}
 .paper.mode-draw .paper-fields{opacity:.98}
