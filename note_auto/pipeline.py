@@ -26,13 +26,20 @@ class PipelineResult:
 
 
 def collect_past_titles(*dirs: str) -> List[str]:
-    """過去記事(.md)の見出しからタイトル一覧を集める（重複ネタ回避用）."""
+    """過去記事(.md)の見出しからタイトル一覧を集める（重複ネタ回避用）.
+
+    新しい記事が先頭に来るよう**新しい順**で返す。ファイル名が
+    `YYYY-MM-DD-...` の日付始まりなので、降順ソート＝新しい順になる。
+    呼び出し側（ideas.py）がこのリストの先頭から一定件数だけを使うため、
+    ここを古い順のままにすると「直近よく繰り返しているネタ」が
+    避けるべきリストから漏れてしまう（実際に起きていた不具合）。
+    """
     titles: List[str] = []
     for d in dirs:
         p = pathlib.Path(d)
         if not p.exists():
             continue
-        for md in sorted(p.glob("*.md")):
+        for md in sorted(p.glob("*.md"), reverse=True):
             try:
                 first = md.read_text(encoding="utf-8").lstrip().splitlines()[0]
             except (OSError, IndexError):

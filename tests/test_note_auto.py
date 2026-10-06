@@ -111,16 +111,17 @@ def test_build_prompt_includes_avoid_titles():
     p = _build_prompt(NoteAutoConfig(theme="お菓子"), count=3, research=False,
                       avoid_titles=["既出タイトルA", "既出タイトルB"])
     assert "既出タイトルA" in p
-    assert "かぶらない" in p
+    assert "禁止" in p
     # カテゴリ分散の指示も入る
     assert "カテゴリ" in p
 
 
 def test_collect_past_titles(tmp_path):
+    """直近のネタ被り回避に使うため、新しい記事が先頭に来る（新しい順）."""
     (tmp_path / "2026-01-01-foo.md").write_text("# 記事タイトル1\n\n本文", encoding="utf-8")
     (tmp_path / "2026-01-02-bar.md").write_text("# 記事タイトル2\n\n本文", encoding="utf-8")
     titles = collect_past_titles(str(tmp_path), str(tmp_path / "missing"))
-    assert titles == ["記事タイトル1", "記事タイトル2"]
+    assert titles == ["記事タイトル2", "記事タイトル1"]
 
 
 def test_generate_ideas_structured():
