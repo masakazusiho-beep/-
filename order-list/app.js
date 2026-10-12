@@ -53,24 +53,37 @@
   /* ---------- helpers ---------- */
   function uid() { return "i" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
   function nowISO() { return new Date().toISOString(); }
+  function todayStr() { var d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
   function fmtT(iso) { if (!iso) return ""; var d = new Date(iso); if (isNaN(d)) return ""; return (d.getMonth() + 1) + "/" + d.getDate() + " " + String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0"); }
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
 
   /* ---------- storage (this device) ---------- */
   var KEY = "orderlist.v1";
-  var state = { suppliers: SEED_SUPS.slice(), items: JSON.parse(JSON.stringify(SEED_ITEMS)), filter: "all", q: "", collapsed: {}, savedAt: "" };
+  var state = { suppliers: SEED_SUPS.slice(), items: JSON.parse(JSON.stringify(SEED_ITEMS)), filter: "all", q: "", collapsed: {}, savedAt: "", resetDate: "" };
   (function load() {
     try {
       var r = localStorage.getItem(KEY);
-      if (r) { var d = JSON.parse(r); if (d && d.items && Array.isArray(d.suppliers)) { state.suppliers = d.suppliers; state.items = d.items; state.savedAt = d.savedAt || ""; } }
+      if (r) { var d = JSON.parse(r); if (d && d.items && Array.isArray(d.suppliers)) { state.suppliers = d.suppliers; state.items = d.items; state.savedAt = d.savedAt || ""; state.resetDate = d.resetDate || ""; } }
     } catch (e) {}
   })();
   var storageOK = true;
   function save() {
     state.savedAt = nowISO();
-    try { localStorage.setItem(KEY, JSON.stringify({ suppliers: state.suppliers, items: state.items, savedAt: state.savedAt })); storageOK = true; }
+    try { localStorage.setItem(KEY, JSON.stringify({ suppliers: state.suppliers, items: state.items, savedAt: state.savedAt, resetDate: state.resetDate })); storageOK = true; }
     catch (e) { storageOK = false; toast("保存できませんでした（端末の空き容量やブラウザ設定をご確認ください）"); }
     paintMode();
+  }
+
+  /* 日付が変わったらチェックを自動解除（発注後に毎回手動で解除しなくてよいように） */
+  function autoDailyReset() {
+    var today = todayStr();
+    if (!state.resetDate) { state.resetDate = today; save(); return; }
+    if (state.resetDate === today) return;
+    var had = false;
+    Object.keys(state.items).forEach(function (id) { if (state.items[id].checked) { state.items[id].checked = false; had = true; } });
+    state.resetDate = today;
+    save(); render();
+    if (had) toast("日付が変わったのでチェックを自動解除しました");
   }
   function paintMode() { $("#modeTxt").textContent = storageOK ? ("この端末に保存" + (state.savedAt ? "　" + fmtT(state.savedAt) : "")) : "保存できません"; $("#mode").className = "mode " + (storageOK ? "local" : "err"); }
 
@@ -237,7 +250,12 @@
 
   /* ---------- boot ---------- */
   if (!state.savedAt) save(); else paintMode();
+  autoDailyReset();
   render();
+
+  // アプリを開きっぱなしで日をまたいだ場合もカバーする
+  document.addEventListener("visibilitychange", function () { if (!document.hidden) autoDailyReset(); });
+  setInterval(autoDailyReset, 60 * 1000);
 
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", function () { navigator.serviceWorker.register("sw.js").catch(function () {}); });
