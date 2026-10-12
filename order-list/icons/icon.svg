@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="発注チェック">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#E8903F"/>
+      <stop offset="1" stop-color="#7A3A08"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#bg)"/>
+  <!-- clipboard -->
+  <rect x="146" y="110" width="220" height="300" rx="20" fill="#FBF3E9"/>
+  <rect x="206" y="92" width="100" height="40" rx="14" fill="#7A3A08"/>
+  <rect x="222" y="104" width="68" height="18" rx="8" fill="#FBF3E9"/>
+  <!-- checklist rows -->
+  <g>
+    <rect x="178" y="178" width="26" height="26" rx="6" fill="#E8903F"/>
+    <path d="M186 191 l6 7 l12 -16" stroke="#FBF3E9" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="218" y="183" width="120" height="16" rx="8" fill="#D9C2A3"/>
+
+    <rect x="178" y="232" width="26" height="26" rx="6" fill="#E8903F"/>
+    <path d="M186 245 l6 7 l12 -16" stroke="#FBF3E9" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="218" y="237" width="140" height="16" rx="8" fill="#D9C2A3"/>
+
+    <rect x="178" y="286" width="26" height="26" rx="6" fill="none" stroke="#C9A878" stroke-width="5"/>
+    <rect x="218" y="291" width="100" height="16" rx="8" fill="#D9C2A3"/>
+  </g>
+  <!-- frequent-order star badge -->
+  <g transform="translate(366,312)">
+    <circle r="48" fill="#F0B658"/>
+    <path d="M0 -24 L7 -7 L26 -7 L11 5 L17 24 L0 12 L-17 24 L-11 5 L-26 -7 L-7 -7 Z" fill="#7A3A08"/>
+  </g>
+</svg>

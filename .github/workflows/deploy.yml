@@ -8,6 +8,7 @@ on:
       - "stock-board/**"
       - "osusume/**"
       - "recipe-book/**"
+      - "order-list/**"
       - ".github/workflows/deploy.yml"
   workflow_dispatch:
 
@@ -37,6 +38,7 @@ jobs:
           cp -r stock-board _site/stock-board
           cp -r osusume _site/osusume
           cp -r recipe-book _site/recipe-book
+          cp -r order-list _site/order-list
           touch _site/.nojekyll
           cat > _site/index.html <<'EOF'
           <!doctype html>
@@ -66,6 +68,7 @@ jobs:
             <a class="app" href="bakers-note/"><img src="bakers-note/icons/icon.svg" alt=""><div><b>ベーカーズ％ノート</b><span>製菓レシピをベーカーズ％に変換・スケール</span></div></a>
             <a class="app" href="osusume/"><img src="osusume/icons/icon.svg" alt=""><div><b>おすすめ道具</b><span>お菓子作りのおすすめ道具・材料まとめ</span></div></a>
             <a class="app" href="recipe-book/"><img src="recipe-book/icons/icon.svg" alt=""><div><b>レシピ帳</b><span>料理名・材料欄のテンプレにApple Pencilで書き込めるレシピ帳</span></div></a>
+            <a class="app" href="order-list/"><img src="order-list/icons/icon.svg" alt=""><div><b>発注チェック</b><span>仕入先ごとに商品を並べて、発注する物にチェックしてコピー</span></div></a>
           </main>
           </body>
           </html>

@@ -91,3 +91,5 @@ python -m pytest
   場所ごとに数えて要発注リストをコピーできる PWA（GitHub Pages で公開）。
 - [`recipe-book/`](recipe-book/README.md) — レシピ帳: 料理名・材料欄のテンプレに Apple Pencil
   で自由に書き込める手書きノート PWA。料理／デザート／ドリンクで分類（GitHub Pages で公開）。
+- [`order-list/`](order-list/README.md) — 発注チェック: 仕入先ごとに商品を並べ、発注する物に
+  チェックを付けてコピーできる発注リスト PWA（GitHub Pages で公開）。
