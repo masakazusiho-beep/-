@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>発注チェック</title>
+<meta name="description" content="仕入先ごとに商品を並べて、発注する物にチェックを付けてコピーできる発注リストアプリ。">
+<meta name="theme-color" content="#B5540C" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1C140D" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="発注チェック">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Zen+Kaku+Gothic+New:wght@500;700&family=Roboto+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand">
+      <h1>発注チェック</h1>
+      <span class="mode local" id="mode"><span class="dot"></span><span id="modeTxt">この端末に保存</span></span>
+    </div>
+    <div class="stats" role="group" aria-label="絞り込み">
+      <button class="stat on" data-filter="checked"><span class="k">チェック中</span><span class="v" id="nChecked">–</span></button>
+      <button class="stat warn" data-filter="freq"><span class="k">頻度多め</span><span class="v" id="nFreq">–</span></button>
+      <button class="stat" data-filter="all"><span class="k">全品目</span><span class="v" id="nAll">–</span></button>
+    </div>
+    <div class="tools">
+      <label class="search"><span aria-hidden="true">🔍</span><input id="q" type="search" placeholder="品名で検索" autocomplete="off"></label>
+      <button class="icon-btn" id="exportBtn" aria-label="バックアップを書き出し" title="書き出し">💾</button>
+      <button class="icon-btn" id="importBtn" aria-label="バックアップを読み込み" title="読み込み">📂</button>
+      <input type="file" id="importFile" accept="application/json,.json" hidden>
+      <button class="icon-btn" id="themeBtn" aria-label="表示テーマ切替">◑</button>
+    </div>
+  </div>
+</header>
+
+<main><div class="wrap" id="list"></div></main>
+
+<footer class="actions">
+  <div class="wrap">
+    <button class="btn grow" id="copyBtn"><span class="ic">📋</span>発注リスト</button>
+    <button class="btn" id="resetBtn" aria-label="チェックを全解除"><span class="ic">↺</span></button>
+    <button class="btn primary" id="addBtn">＋ 品目</button>
+  </div>
+</footer>
+
+<div class="backdrop" id="backdrop" hidden></div>
+
+<div class="sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+  <div class="grab"></div>
+  <h3 id="sheetTitle">品目を編集</h3>
+  <div class="form">
+    <div class="f"><label for="eName">品名</label><input id="eName" type="text" placeholder="例：バター"></div>
+    <div class="f"><label for="eSup">仕入先</label><select id="eSup"></select></div>
+    <label class="check-row"><input type="checkbox" id="eFreq"><span>★ 頻度多め（発注忘れ防止で目立たせる）</span></label>
+    <div class="f"><label for="eNote">備考</label><input id="eNote" type="text" placeholder="例：2ケースで"></div>
+    <div class="meta" id="eMeta"></div>
+    <div class="foot">
+      <button class="btn danger" id="eDel">削除</button>
+      <button class="btn grow primary" id="eSave">保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="sheet" id="supSheet" hidden role="dialog" aria-modal="true" aria-labelledby="supTitle">
+  <div class="grab"></div>
+  <h3 id="supTitle">仕入先を追加</h3>
+  <div class="form">
+    <div class="f"><label for="supName">仕入先の名前</label><input id="supName" type="text" placeholder="例：〇〇食品"></div>
+    <div class="foot"><button class="btn grow primary" id="supSave">追加</button></div>
+  </div>
+</div>
+
+<div class="sheet" id="importSheet" hidden role="dialog" aria-modal="true" aria-labelledby="importTitle">
+  <div class="grab"></div>
+  <h3 id="importTitle">バックアップを読み込み</h3>
+  <div class="form">
+    <div class="preview" id="iPreview"></div>
+    <p class="hint">読み込むと、<b>今のデータはこのファイルの内容に置き換わります</b>。念のため先に「💾 書き出し」で今の状態を保存しておくと安心です。</p>
+    <div class="foot"><button class="btn grow primary" id="iApply">置き換えて読み込む</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="app.js"></script>
+</body>
+</html>

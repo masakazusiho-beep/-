@@ -1,0 +1,19 @@
+{
+  "name": "発注チェック",
+  "short_name": "発注",
+  "description": "仕入先ごとに商品を並べて、発注する物にチェックを付けてコピーできる発注リストアプリ。",
+  "lang": "ja",
+  "start_url": "./",
+  "scope": "./",
+  "id": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F7F2EC",
+  "theme_color": "#B5540C",
+  "icons": [
+    { "src": "icons/icon.svg", "type": "image/svg+xml", "sizes": "any", "purpose": "any" },
+    { "src": "icons/icon-192.png", "type": "image/png", "sizes": "192x192", "purpose": "any" },
+    { "src": "icons/icon-512.png", "type": "image/png", "sizes": "512x512", "purpose": "any" },
+    { "src": "icons/icon-512.png", "type": "image/png", "sizes": "512x512", "purpose": "maskable" }
+  ]
+}
